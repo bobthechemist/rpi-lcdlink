@@ -75,6 +75,9 @@ static int lcdHandle ;
 
 // Example of how a user-defined character is defined.
 
+/*
+ * New characters can be 'drawn' using 5-bit binary such as
+ *
 static unsigned char newChar [8] = 
 {
   0b00100,
@@ -86,9 +89,14 @@ static unsigned char newChar [8] =
   0b11011,
   0b10001,
 } ;
+ * 
+ * For Mathlink purposes, these characters can be represented
+ * as integers from 0 to 31.
+*/
+static unsigned char newChar [8] = {4,4,0,4,14,27,27,17};
 
-
-
+static unsigned char newChars [512][8];
+/* Above should allow us space to change all ASCII characters */
 
 
 
@@ -210,21 +218,34 @@ int mllcdclear();
 int mllcdcolor(int color);
 int mllcdposition(int col, int row);
 int mllcdscroll(int row, char *buf);
+int mllcdputc(int col, int row, int charnum);
+int mllcdchardef(int charnum, int charb [8]);
 
 /* mathlink main routine */
 int main(int argc, char *argv[])
 {
+   int i, j;
 
 
-
+// Set up the LCD interface
     wiringPiSetupSys () ;
     mcp23017Setup (AF_BASE, 0x20) ;
     adafruitLCDSetup (1) ;
+
+// Populate the newChars array with the default newChar
+    for(i = 0; i<512; i++)
+    {
+        for (j=0; j<8; j++)
+        {
+            newChars[i][j] = newChar[j];
+        }
+    }
 
     return MLMain(argc, argv);
 }
 
 /* mathlink function definitions */
+
 int mllcdputs(char *buf)
 {
     lcdPuts(lcdHandle, buf);
@@ -258,5 +279,37 @@ int mllcdscroll(int row, char *buf)
         }
 
     }
+}
+
+
+/* Debugging ideas
+ * 
+ * Cannot assign an array 'the easy way', must loop.
+ * Minimum working putc is lcdCharDef -> lcdPosition -> lcdPutchar
+ * Using the multidimensional array correctly.
+*/
+int mllcdputc(int col, int row, int  charnum)
+{
+    lcdPosition(lcdHandle,col,row);
+    lcdPutchar(lcdHandle,charnum);
+
+    return 0;
+}
+/* Some debugging information
+ * lcdCharDef alters the ASCII code, presently only 0 through 7 are
+ * individually addressable. 8 through 15 duplicate 0 through 7.
+ * 256 through 263 are addressable, with 264 through 271 duplicating. 
+*/
+int mllcdchardef (int charnum, int charb [8])
+{
+    int i;
+
+    for (i = 0; i < 8; i++)
+    {
+        newChars[charnum][i]=charb[i];
+    }
+    
+    lcdCharDef(lcdHandle,charnum,newChars[charnum]);
+    return 0;
 }
 
