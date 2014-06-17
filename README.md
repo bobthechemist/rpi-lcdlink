@@ -16,4 +16,14 @@ Compile with:
 mcc -o lcdlink lcdlink.c lcdlink.tm -I/usr/local/include -lwiringPi -lwiringPiDev -lpthread -lm
 
 
+or with:
+
+make lcdlink
+
+Version
+=======
+
+No versioning tags yet.  Latest version includes Makefile to simplify
+compiling, usage descriptions for all public functions and a modification
+to lcdPuts that allows position assignment as does lcdPutc.
 

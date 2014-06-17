@@ -28,11 +28,11 @@
  ***********************************************************************
  */
 
-#include <stdio.h>
+//#include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
-#include <time.h>
+//#include <time.h>
 
 #include <wiringPi.h>
 #include <mcp23017.h>
@@ -95,8 +95,15 @@ static unsigned char newChar [8] =
 */
 static unsigned char newChar [8] = {4,4,0,4,14,27,27,17};
 
-static unsigned char newChars [512][8];
-/* Above should allow us space to change all ASCII characters */
+
+/* Extra memory is allocated for writing custom characters
+ * to allow future versions the ability to switch between
+ * custom characters in the c-code as opposed to doing it
+ * through the MathLink, which I suspect is much slower.
+ * 
+*/
+static unsigned char newChars [32][8];
+
 
 
 
@@ -204,13 +211,6 @@ static void adafruitLCDSetup (int color)
 }
 
 
-
-
-
-
-
-
-
 /* mathlink function calls */
 
 int mllcdputs(char *buf);
@@ -222,6 +222,7 @@ int mllcdputc(int col, int row, int charnum);
 int mllcdchardef(int charnum, int charb [8]);
 
 /* mathlink main routine */
+
 int main(int argc, char *argv[])
 {
    int i, j;
@@ -231,7 +232,12 @@ int main(int argc, char *argv[])
     wiringPiSetupSys () ;
     mcp23017Setup (AF_BASE, 0x20) ;
     adafruitLCDSetup (1) ;
-
+    lcdPosition(lcdHandle, 5,0);
+    lcdPuts(lcdHandle, "Install");
+    lcdPosition(lcdHandle,3,1);
+    lcdPuts(lcdHandle, "successful!");
+    
+/* Not needed anymore
 // Populate the newChars array with the default newChar
     for(i = 0; i<512; i++)
     {
@@ -240,7 +246,7 @@ int main(int argc, char *argv[])
             newChars[i][j] = newChar[j];
         }
     }
-
+*/
     return MLMain(argc, argv);
 }
 
@@ -282,12 +288,7 @@ int mllcdscroll(int row, char *buf)
 }
 
 
-/* Debugging ideas
- * 
- * Cannot assign an array 'the easy way', must loop.
- * Minimum working putc is lcdCharDef -> lcdPosition -> lcdPutchar
- * Using the multidimensional array correctly.
-*/
+
 int mllcdputc(int col, int row, int  charnum)
 {
     lcdPosition(lcdHandle,col,row);
@@ -295,10 +296,10 @@ int mllcdputc(int col, int row, int  charnum)
 
     return 0;
 }
-/* Some debugging information
- * lcdCharDef alters the ASCII code, presently only 0 through 7 are
+/* 
+ * lcdCharDef alters the ASCII code, only 0 through 7 are
  * individually addressable. 8 through 15 duplicate 0 through 7.
- * 256 through 263 are addressable, with 264 through 271 duplicating. 
+ *  
 */
 int mllcdchardef (int charnum, int charb [8])
 {
