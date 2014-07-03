@@ -183,7 +183,6 @@ static void adafruitLCDSetup (int color)
   setBacklightColor (color) ;
 
 //	Input buttons
-//      (Will be set up but not used)
 
   for (i = 0 ; i <= 4 ; ++i)
   {
@@ -220,6 +219,7 @@ int mllcdposition(int col, int row);
 int mllcdscroll(int row, char *buf);
 int mllcdputc(int col, int row, int charnum);
 int mllcdchardef(int charnum, int charb [8]);
+void mllcdbuttonstat();
 
 /* mathlink main routine */
 
@@ -314,3 +314,20 @@ int mllcdchardef (int charnum, int charb [8])
     return 0;
 }
 
+void mllcdbuttonstat()
+{
+  int i;
+  int val[5]={0,0,0,0,0};
+
+/* perhaps inelegant, but cycle through the buttons */
+
+  if(digitalRead(AF_SELECT)==LOW) val[0]=1;
+  if(digitalRead(AF_LEFT)==LOW) val[1]=1;
+  if(digitalRead(AF_UP)==LOW) val[2]=1;
+  if(digitalRead(AF_RIGHT)==LOW) val[3]=1;
+  if(digitalRead(AF_DOWN)==LOW) val[4]=1;
+
+  MLPutInteger32List(stdlink,val,5);
+
+  return;
+}

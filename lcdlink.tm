@@ -19,6 +19,7 @@
 :Evaluate: lcdScroll::usage = "lcdScroll[row,buf] scrolls buf across row on the LCD. Press SELECT on the LCD plate to cancel the scroll."
 :Evaluate: lcdPutc::usage = "lcdPutc[col, row, charnum] puts the ASCII code character charnum at the position {col, row}."
 :Evaluate: lcdCharDef::usage = "lcdCharDef[charnum, charb] defines the custom character charnum as charb.  charnum must be 0 .. 7 and charb is a list of Integers of length 8."
+:Evaluate: lcdButtonStatus::usage = "lcdButtonStatus[] returns an array indicating if buttons are pressed (1) or released (0).  Order is SELECT, LEFT, UP, RIGHT, DOWN."
 
 
 
@@ -79,6 +80,14 @@
 :Arguments:	{charnum, charb}
 :ArgumentTypes:	{Integer, IntegerList}
 :ReturnType:	Integer
+:End:
+
+:Begin:
+:Function:	mllcdbuttonstat
+:Pattern:	lcdButtonStatus[]
+:Arguments:	{}
+:ArgumentTypes:	{}
+:ReturnType:	Manual
 :End:
 
 /*
